@@ -110,11 +110,11 @@ func Open(options OpenOptions) (io.ReadWriteCloser, error) {
 	return openInternal(options)
 }
 
-func setDTR(file uint, setstate bool) error {
+func SetDTR(file uint, setstate bool) error {
 	return OSsetDTR(file, setstate)
 }
 
-func setRTS(file uint, setstate bool) error {
+func SetRTS(file uint, setstate bool) error {
 	return OSsetRTS(file, setstate)
 }
 
