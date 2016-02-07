@@ -227,7 +227,7 @@ func openInternal(options OpenOptions) (io.ReadWriteCloser, error) {
 		syscall.SYS_IOCTL,
 		uintptr(file.Fd()),
 		uintptr(kIOSSIOSPEED),
-		uintptr(unsafe.Pointer(&options.BaudRate)));
+		uintptr(unsafe.Pointer(&options.BaudRate)))
 
 	if errno2 != 0 {
 		return nil, os.NewSyscallError("SYS_IOCTL", errno2)
@@ -239,4 +239,10 @@ func openInternal(options OpenOptions) (io.ReadWriteCloser, error) {
 
 	// We're done.
 	return file, nil
+}
+
+func OSsetDTR(file uint, setstate bool) error {
+}
+
+func OSsetRTS(file uint, setstate bool) error {
 }

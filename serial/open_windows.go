@@ -315,3 +315,9 @@ func getOverlappedResult(h syscall.Handle, overlapped *syscall.Overlapped) (int,
 
 	return n, nil
 }
+
+func OSsetDTR(file uint, setstate bool) error {
+}
+
+func OSsetRTS(file uint, setstate bool) error {
+}

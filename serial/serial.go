@@ -110,6 +110,14 @@ func Open(options OpenOptions) (io.ReadWriteCloser, error) {
 	return openInternal(options)
 }
 
+func setDTR(file uint, setstate bool) error {
+	return OSsetDTR(file, setstate)
+}
+
+func setRTS(file uint, setstate bool) error {
+	return OSsetRTS(file, setstate)
+}
+
 // Rounds a float to the nearest integer.
 func round(f float64) float64 {
 	return math.Floor(f + 0.5)

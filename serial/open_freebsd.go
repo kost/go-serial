@@ -19,3 +19,9 @@ import "io"
 func openInternal(options OpenOptions) (io.ReadWriteCloser, error) {
 	return nil, "Not implemented on this OS."
 }
+
+func OSsetDTR(file uint, setstate bool) error {
+}
+
+func OSsetRTS(file uint, setstate bool) error {
+}

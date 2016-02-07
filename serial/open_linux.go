@@ -23,9 +23,14 @@ import (
 // }
 //
 const (
-	kTCSETS2 = 0x402C542B
-	kBOTHER  = 0x1000
-	kNCCS    = 19
+	kTCSETS2  = 0x402C542B
+	kTIOCMGET = 0x00005415
+	kTIOCMSET = 0x00005418
+	kBOTHER   = 0x1000
+	kNCCS     = 19
+	// from asm-generic/termios.h
+	kTIOCM_DTR uint32 = 0x002
+	kTIOCM_RTS uint32 = 0x004
 )
 
 //
@@ -112,6 +117,10 @@ func makeTermios2(options OpenOptions) (*termios2, error) {
 		return nil, errors.New("invalid setting for DataBits")
 	}
 
+	//	if options.cts {
+	//		t2.c_cflag |= syscall.CD
+	//	}
+
 	return t2, nil
 }
 
@@ -152,4 +161,58 @@ func openInternal(options OpenOptions) (io.ReadWriteCloser, error) {
 	}
 
 	return file, nil
+}
+
+func OSsetDTR(file uint, setstate bool) error {
+	var serialset uint32
+
+	// fdptr := uintptr(file.Fd())
+	fdptr := uintptr(file)
+	r, _, errno := syscall.Syscall(syscall.SYS_IOCTL, fdptr, uintptr(kTIOCMGET), uintptr(serialset))
+	if errno != 0 {
+		return os.NewSyscallError("SYS_IOCTL kTIOCMGET", errno)
+	}
+	if r != 0 {
+		return errors.New("unknown error from kTIOCMGET SYS_IOCTL")
+	}
+	if setstate {
+		serialset |= (kTIOCM_DTR) // set bit
+	} else {
+		serialset &= ^(kTIOCM_DTR) // clear bit
+	}
+	r, _, errno = syscall.Syscall(syscall.SYS_IOCTL, fdptr, uintptr(kTIOCMSET), uintptr(serialset))
+	if errno != 0 {
+		return os.NewSyscallError("SYS_IOCTL kTIOCMSET", errno)
+	}
+	if r != 0 {
+		return errors.New("unknown error from kTIOCMSET SYS_IOCTL")
+	}
+	return nil
+}
+
+func OSsetRTS(file uint, setstate bool) error {
+	var serialset uint32
+
+	// fdptr := uintptr(file.Fd())
+	fdptr := uintptr(file)
+	r, _, errno := syscall.Syscall(syscall.SYS_IOCTL, fdptr, uintptr(kTIOCMGET), uintptr(serialset))
+	if errno != 0 {
+		return os.NewSyscallError("SYS_IOCTL kTIOCMGET", errno)
+	}
+	if r != 0 {
+		return errors.New("unknown error from kTIOCMGET SYS_IOCTL")
+	}
+	if setstate {
+		serialset |= (kTIOCM_RTS) // set bit
+	} else {
+		serialset &= ^(kTIOCM_RTS) // clear bit
+	}
+	r, _, errno = syscall.Syscall(syscall.SYS_IOCTL, fdptr, uintptr(kTIOCMSET), uintptr(serialset))
+	if errno != 0 {
+		return os.NewSyscallError("SYS_IOCTL kTIOCMSET", errno)
+	}
+	if r != 0 {
+		return errors.New("unknown error from kTIOCMSET SYS_IOCTL")
+	}
+	return nil
 }
